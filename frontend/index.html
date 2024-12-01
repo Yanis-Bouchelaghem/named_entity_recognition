@@ -5,6 +5,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>GloVe Model Interface</title>
   <link rel="stylesheet" href="index.css"> <!-- Link to the CSS file -->
+  <style>
+    .highlight {
+      font-weight: bold;
+      padding: 0 3px;
+      border-radius: 3px;
+    }
+    .label-scientist {
+      background-color: #ffeb3b;
+    }
+    .label-date {
+      background-color: #8bc34a;
+    }
+    .label-other {
+      background-color: #03a9f4;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
@@ -24,7 +40,7 @@
         oninput="updateThresholdValue()"
       >
     </div>
-    <button>Run Model</button>
+    <button id="run-model">Run Model</button>
     <div class="output" id="output">Output will appear here...</div>
   </div>
   <script>
@@ -33,6 +49,57 @@
       const output = document.getElementById('threshold-value');
       output.textContent = slider.value;
     }
+
+    function highlightText(text, annotations) {
+      let highlightedText = '';
+      let currentIndex = 0;
+
+      annotations.forEach(annotation => {
+        const { start, end, text, label } = annotation;
+        if (currentIndex < start) {
+          highlightedText += text.slice(currentIndex, start); // Add unhighlighted text
+        }
+        highlightedText += `<span class="highlight label-${label.trim().toLowerCase()}">${text}</span>`; // Add highlighted text
+        currentIndex = end;
+      });
+
+      if (currentIndex < text.length) {
+        highlightedText += text.slice(currentIndex); // Add remaining unhighlighted text
+      }
+
+      return highlightedText;
+    }
+
+    document.getElementById('run-model').addEventListener('click', async () => {
+      const inputText = document.getElementById('input-text').value;
+      const inputLabels = document.getElementById('input-labels').value;
+      const threshold = parseFloat(document.getElementById('threshold').value);
+      
+      const requestBody = {
+        text: inputText,
+        labels: inputLabels,
+        threshold: threshold
+      };
+
+      try {
+        const response = await fetch('http://localhost:8000/inference', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(requestBody)
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        const outputDiv = document.getElementById('output');
+        outputDiv.innerHTML = highlightText(inputText, result);
+      } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('output').textContent = 'An error occurred while processing the request.';
+      }
+    });
   </script>
 </body>
 </html>
