@@ -72,6 +72,7 @@
       }
 
     document.getElementById('run-model').addEventListener('click', async () => {
+      const runModelButton = document.getElementById('run-model');
       const inputText = document.getElementById('input-text').value;
       const inputLabels = document.getElementById('input-labels').value;
       const threshold = parseFloat(document.getElementById('threshold').value);
@@ -81,7 +82,10 @@
         labels: inputLabels,
         threshold: threshold
       };
-
+      // Disable the button to prevent multiple clicks
+      runModelButton.disabled = true;
+      runModelButton.textContent = "Processing..."; // Optional: change button text to indicate processing
+      
       try {
         const response = await fetch('http://localhost:8000/inference', {
           method: 'POST',
@@ -99,6 +103,10 @@
       } catch (error) {
         console.error('Error:', error);
         document.getElementById('output').textContent = 'An error occurred while processing the request.';
+      } finally {
+        // Re-enable the button
+        runModelButton.disabled = false;
+        runModelButton.textContent = "Run Model"; // Optional: reset button text
       }
     });
   </script>
