@@ -51,24 +51,36 @@
     }
 
     function highlightText(text, annotations) {
-      let highlightedText = '';
-      let currentIndex = 0;
-
-      annotations.forEach(annotation => {
-        const { start, end, text, label } = annotation;
-        if (currentIndex < start) {
-          highlightedText += text.slice(currentIndex, start); // Add unhighlighted text
+        let highlightedText = '';
+        let currentIndex = 0;
+  
+        annotations.forEach(annotation => {
+          const { start, end, text: annotatedText, label } = annotation;
+          if (currentIndex < start) {
+            highlightedText += text.slice(currentIndex, start); // Add unhighlighted text
+          }
+  
+          // Add the highlighted text with the label next to it
+          highlightedText += `<span class="highlight" style="background-color: ${getColorForLabel(label)};">
+              ${annotatedText}<span class="label">(${label})</span>
+            </span>`;
+  
+          currentIndex = end;
+        });
+  
+        if (currentIndex < text.length) {
+          highlightedText += text.slice(currentIndex); // Add remaining unhighlighted text
         }
-        highlightedText += `<span class="highlight label-${label.trim().toLowerCase()}">${text}</span>`; // Add highlighted text
-        currentIndex = end;
-      });
-
-      if (currentIndex < text.length) {
-        highlightedText += text.slice(currentIndex); // Add remaining unhighlighted text
+  
+        return highlightedText;
       }
-
-      return highlightedText;
-    }
+  
+      function getColorForLabel(label) {
+        // Generate a color for the label (same color for the same label)
+        const hash = Array.from(label).reduce((acc, char) => acc + char.charCodeAt(0), 0);
+        const hue = hash % 360; // Use hue from HSL
+        return `hsl(${hue}, 70%, 80%)`;
+      }
 
     document.getElementById('run-model').addEventListener('click', async () => {
       const inputText = document.getElementById('input-text').value;
