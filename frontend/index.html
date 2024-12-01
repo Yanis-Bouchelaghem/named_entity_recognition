@@ -6,26 +6,11 @@
   <title>GloVe Model Interface</title>
   <link rel="stylesheet" href="index.css"> <!-- Link to the CSS file -->
   <style>
-    .highlight {
-      font-weight: bold;
-      padding: 0 3px;
-      border-radius: 3px;
-      display: inline; /* Ensure spans are displayed inline */
-      margin-right: 5px;
-      white-space: nowrap; /* Prevent wrapping within the highlight */
-    }
-    .label {
-      font-size: 0.8em;
-      color: #fff;
-      background-color: #333;
-      padding: 2px 4px;
-      border-radius: 3px;
-      margin-left: 5px;
-      display: inline; /* Ensure the label stays inline */
-    }
+
   </style>
 </head>
 <body>
+  <canvas id="spaceCanvas"></canvas>
   <div class="container">
     <h1>GloVe Model Interface</h1>
     <textarea id="input-text" rows="5" placeholder="Enter your text here..."></textarea>
@@ -46,6 +31,7 @@
     <button id="run-model">Run Model</button>
     <div class="output" id="output">Output will appear here...</div>
   </div>
+  <script src="script.js"></script>
   <script>
     function updateThresholdValue() {
       const slider = document.getElementById('threshold');
